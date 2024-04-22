@@ -141,6 +141,45 @@ def copy_contact():
         
         print("Контакты успешно скопированы!")
 
+# Функция для изменения контактов в телефонной книге
+def edit_contact():
+    print("Найденные контакты:")
+    found_contacts = find_contact()
+    
+    if not found_contacts:
+        # Если контакт не найден, сообщаем об этом и выходим из функции
+        print("Контакт не найден! Изменение невозможно!")
+        return
+    
+    confirm_edit = input("Вы уверены, что хотите изменить найденные контакты? (да/нет): ")
+    if confirm_edit.lower() == 'да':    
+        # Создаем список для хранения измененных контактов
+        updated_contacts = []
+        for contact in found_contacts:
+            print("Текущая информация о контакте:", contact)
+            updated_contact = ask_data()
+            # Обновляем найденный контакт информацией, введенной пользователем
+            contact[1:] = updated_contact.values()
+            updated_contacts.append(contact)
+        
+        # Считываем содержимое файла в список строк
+        with open('phonebook.txt', 'r', encoding='utf-8') as file:
+            lines = file.readlines()
+        
+        # Обновляем строки файла с информацией о контактах
+        for contact_info in updated_contacts:
+            for i, line in enumerate(lines):
+                if line.startswith(contact_info[0]):
+                    lines[i] = f"{contact_info[0]};{';'.join(contact_info[1:])}\n"
+                    break
+        
+        # Перезаписываем файл с обновленными строками
+        with open('phonebook.txt', 'w', encoding='utf-8') as file:
+            file.writelines(lines)
+        
+        print("Контакты успешно изменены!")
+        
+
 # Основная функция (меню), управляющая всей программой
 def main():
     while True:
@@ -150,9 +189,10 @@ def main():
             3: delete_contact,
             4: open_phonebook,
             5: copy_contact,
+            6: edit_contact,
             0: exit
         }
-        is_stop = int(input("Выберете действие:\n1. Найти\n2. Добавить\n3. Удалить\n4. Просмотреть книгу\n5. Копирование контактов\n0. Выход\n>  "))
+        is_stop = int(input("Выберете действие:\n1. Найти\n2. Добавить\n3. Удалить\n4. Просмотреть книгу\n5. Копирование контактов\n6. Изменить контакт\n0. Выход\n>  "))
         action = actions.get(is_stop)
         if action:
             action()
